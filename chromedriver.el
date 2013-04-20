@@ -27,6 +27,9 @@
 
 (defun set-new-ws-connection (tab-name)
   (let ((address (get-address-for tab-name)))
+    (when chromedriver-connection
+      (websocket-close chromedriver-connection)
+      (setq chromedriver-connection nil))
     (set-chromedriver-tab-id address)
     (setq chromedriver-connection
           (websocket-open address
@@ -48,11 +51,11 @@
 
 (defun eval-in-browser (expr)
   "Evaluate expresion in the web browser's console"
-  (websocket-send-text ws (json-encode `(:id 6 :method "Runtime.evaluate" :params (:expression ,expr)))))
+  (websocket-send-text chromedriver-connection
+                       (json-encode `(:id chromedriver-tab-id :method "Runtime.evaluate" :params (:expression ,expr)))))
 
-;; (eval-in-browser "console.log('szesc!');")
-;; (eval-in-browser "function add(a,b) { return a+b; }; add(2, 10);")
-
+;;(eval-in-browser "console.log('szesc!');")
+;;(eval-in-browser "function add(a,b) { return a+b; }; add(2, 10);")
 ;; (eval-in-browser "MM.categoryListView.children[0].model.get('name')")
 
 (provide 'chromedriver)

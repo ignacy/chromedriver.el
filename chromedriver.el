@@ -23,7 +23,7 @@
 
 (defun set-chromedriver-tab-id (address)
   (setq chromedriver-tab-id
-        (substring address (+ 1 (string-match "/[0-9]+" address)))))
+        (string-to-number (substring address (+ 1 (string-match "/[0-9]+" address))))))
 
 (defun set-new-ws-connection (tab-name)
   (let ((address (get-address-for tab-name)))
@@ -41,7 +41,10 @@
     (message "Connecting to.. %s" name)
     (set-new-ws-connection name)))
 
-;; (websocket-send-text ws (json-encode '(:id 6 :method "Page.reload")))
+(defun reload-chrome-tab ()
+  (interactive)
+  (websocket-send-text chromedriver-connection
+                       (json-encode '(:id chromedriver-tab-id :method "Page.reload"))))
 
 (defun eval-in-browser (expr)
   "Evaluate expresion in the web browser's console"
